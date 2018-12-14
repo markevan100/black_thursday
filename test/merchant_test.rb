@@ -21,7 +21,7 @@ class MerchantTest < Minitest::Test
   end
 
   def test_merchant_respository_has_a_merchant_attribute
-    new_merchants = MerchantRepository.new
-    assert_equal [], new_merchants.merchants
+    new_respository = MerchantRepository.new
+    assert_equal 12334105, new_respository.merchants[0][:id]
   end
 end
