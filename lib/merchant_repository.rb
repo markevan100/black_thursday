@@ -1,13 +1,14 @@
 require 'pry'
 require 'csv'
+#'./data/merchants.csv'
 
 class MerchantRepository
 
   attr_accessor :merchants
-  def initialize
+  def initialize(filename = './data/merchants.csv')
     @merchants = []
 
-    CSV.foreach('../data/merchants.csv', headers: true, :header_converters => :symbol, converters: :numeric) do |row|
+    CSV.foreach(filename, headers: true, :header_converters => :symbol, converters: :numeric) do |row|
       merchant = Merchant.new
       merchant = row.to_hash
       @merchants << merchant
