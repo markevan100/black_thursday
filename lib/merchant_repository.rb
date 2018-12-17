@@ -5,7 +5,7 @@ require 'csv'
 class MerchantRepository
 
   attr_accessor :merchants
-  def initialize(filename = './data/merchants.csv')
+  def initialize(filename)
     @merchants = []
 
     CSV.foreach(filename, headers: true, :header_converters => :symbol, converters: :numeric) do |row|

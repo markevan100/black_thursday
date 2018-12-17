@@ -1,13 +1,14 @@
 require 'pry'
 require 'csv'
+#'./data/items.csv'
 
 class ItemRepository
 
   attr_accessor :items
-  def initialize
+  def initialize(filename)
     @items = []
 
-    CSV.foreach('./data/items.csv', headers: true, :header_converters => :symbol, converters: :numeric) do |row|
+    CSV.foreach(filename, headers: true, :header_converters => :symbol, converters: :numeric) do |row|
       item = Item.new
       item = row.to_hash
       @items << item

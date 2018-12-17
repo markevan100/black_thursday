@@ -3,8 +3,12 @@ require_relative 'test_helper'
 class MerchantTest < Minitest::Test
 
   def setup
+    se = SalesEngine.from_csv({
+  :items     => "./data/items.csv",
+  :merchants => "./data/merchants.csv",
+})
     @merchant = Merchant.new
-    @new_repository = MerchantRepository.new
+    @new_repository = MerchantRepository.new(se[:merchants])
   end
 
   #These are tests for the merchant instance
