@@ -20,7 +20,7 @@ class ItemRepository
 
   def find_by_id(id)
     @items.find do |i|
-      m[:id] == id
+      i[:id] == id
     end
   end
 
@@ -66,7 +66,7 @@ class ItemRepository
   # end
 
   def delete(id)
-    @items.delete_if { |m| m[:id] == id }
+    @items.delete_if { |i| i[:id] == id }
   end
 
 end
