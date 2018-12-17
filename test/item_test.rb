@@ -67,14 +67,15 @@ class ItemTest < Minitest::Test
     assert_equal 263567475, one_item[:id]
   end
   #
-  # def test_update_changes_name
-  #   @new_repository.create("MarksPinatas")
-  #   one_merch = @new_repository.find_by_name("MarksPinatas")
-  #   assert_equal 12337412, one_merch[:id]
-  #   @new_repository.update(12337412, "MartysPinatas")
-  #   update_merch = @new_repository.find_by_name("MartysPinatas")
-  #   assert_equal 12337412, one_merch[:id]
-  # end
+  def test_update_changes_name
+    @new_repository.create("Pinata", "A Pinata!", 1500, 12345678)
+    one_item = @new_repository.find_by_name("Pinata")
+    assert_equal 263567475, one_item[:id]
+    @new_repository.update(263567475, "Pinata Ornament", "A Christmas Pinata!", 2000, 12345678)
+    update_item = @new_repository.find_by_name("Pinata Ornament")
+    assert_equal 263567475, update_item[:id]
+    assert_nil @new_repository.find_by_name("Pinata")
+  end
   #
   def test_delete_an_instance_of_a_item_by_id
     @new_repository.create("Pinata", "A Pinata!", 1500, 12345678)

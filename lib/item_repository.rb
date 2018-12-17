@@ -7,7 +7,7 @@ class ItemRepository
   def initialize
     @items = []
 
-    CSV.foreach('../data/items.csv', headers: true, :header_converters => :symbol, converters: :numeric) do |row|
+    CSV.foreach('./data/items.csv', headers: true, :header_converters => :symbol, converters: :numeric) do |row|
       item = Item.new
       item = row.to_hash
       @items << item
@@ -59,11 +59,16 @@ class ItemRepository
       @items << new_one
   end
 
-  # def update(id, name)
-  #   @items.find do |m|
-  #     m[:name] = name if m[:id] == id
-  #   end
-  # end
+  def update(id, name, description, unit_price, merchant_id)
+    @items.find do |i|
+      if i[:id] == id
+        i[:name] = name
+        i[:description] = description
+        i[:unit_price] = unit_price
+        i[:merchant_id] = merchant_id
+      end
+    end
+  end
 
   def delete(id)
     @items.delete_if { |i| i[:id] == id }
