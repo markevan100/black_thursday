@@ -1,9 +1,22 @@
-require 'pry'
+require_relative 'ruby_helper'
 
 class SalesEngine
 
+  attr_reader :hash
+  def initialize(hash)
+    @hash = hash
+  end
+
   def self.from_csv(hash)
-    hash
+    SalesEngine.new(hash)
+  end
+
+  def merchants
+    MerchantRepository.new(hash[:merchants])
+  end 
+
+  def items
+    ItemRepository.new(hash[:items])
   end
 end
 

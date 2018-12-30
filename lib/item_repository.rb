@@ -1,5 +1,4 @@
-require 'pry'
-require 'csv'
+require_relative 'ruby_helper'
 #'./data/items.csv'
 
 class ItemRepository
@@ -9,32 +8,60 @@ class ItemRepository
     @items = []
 
     CSV.foreach(filename, headers: true, :header_converters => :symbol, converters: :numeric) do |row|
-      item = Item.new
-      item = row.to_hash
+      item = Item.new(row.to_hash)
       @items << item
     end
   end
 
+  def inspect
+    "#<#{self.class} #{@items.size} rows>"
+  end
+
   def all
-    @items
+    items
   end
 
   def find_by_id(id)
-    @items.find do |i|
+    items.find do |i|
       i[:id] == id
     end
   end
 
   def find_by_name(name)
-    @items.find do |i|
+    items.find do |i|
       i[:name] == name
     end
   end
 
-  def find_all_by_name(name)
+
+  def find_all_with_description(description)
     array = []
-    @items.find_all do |i|
-      array << i[:name] if i[:name].include?(name)
+    items.find_all do |i|
+      array << i if i[:description].downcase.include?(description.downcase)
+    end
+    array
+  end
+
+  def find_all_by_price(price)
+    array = []
+    items.find_all do |i|
+      array << i if i[:unit_price] == (price.to_i * 100)
+    end
+    array
+  end
+
+  def find_all_by_price_in_range(price_range)
+    array = []
+    items.find_all do |i|
+      array << i if i[:unit_price] >= (price_range.min.to_i * 100) && i[:unit_price] <= (price_range.max.to_i * 100)
+    end
+    array
+  end
+
+  def find_all_by_merchant_id(merchant_id)
+    array = []
+    items.find_all do |i|
+      array << i if i[:merchant_id] == merchant_id
     end
     array
   end
@@ -46,18 +73,8 @@ class ItemRepository
     highest[:id]
   end
 
-  def create(name, description, unit_price, merchant_id)
-    num = self.current_id_max + 1
-    new_one = Item.new
-      new_one[:id] = num
-      new_one[:name] = name
-      new_one[:description] = description
-      new_one[:unit_price] = BigDecimal.new(unit_price,4)
-      new_one[:created_at] = Time.now.strftime("%m/%d/%Y")
-      new_one[:updated_at] = Time.now.strftime("%m/%d/%Y")
-      new_one[:merchant_id] = merchant_id
-
-      @items << new_one
+  def create(attributes)
+    @items.push(Item.new(attributes))
   end
 
   def update(id, name, description, unit_price, merchant_id)
