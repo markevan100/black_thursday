@@ -2,27 +2,21 @@ require_relative 'ruby_helper'
 
 class SalesEngine
 
-  attr_reader :hash
-  def initialize(hash)
-    @hash = hash
+  attr_reader :merchant_repository
+  def initialize(data)
+    @merchant_repository = build_merchants(data[:merchants])
+    # @items = build_items
   end
 
-  def self.from_csv(hash)
-    SalesEngine.new(hash)
+  def self.from_csv(data)
+    SalesEngine.new(data)
   end
 
-  def merchants
-    MerchantRepository.new(hash[:merchants])
+  def build_merchants(file_path)
+    MerchantRepository.new(file_path)
   end 
 
-  def items
-    ItemRepository.new(hash[:items])
-  end
-end
-
-  #
-  # def self.merchants
-  #   h = self
-  #   g = MerchantRepository.new(h[:merchants])
-  #   binding.pry
+  # def build_items
+  #   ItemRepository.new(hash[:items])
   # end
+end
