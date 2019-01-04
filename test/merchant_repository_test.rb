@@ -22,11 +22,10 @@ class MerchantTest < Minitest::Test
     assert_equal 12334105, @mr.merchants.first.id
   end
 
-  # #These test find methods on the merchant_repository class
-  # def test_find_by_id
-  #   one_merch = @new_repository.find_by_id(12336739)
-  #   assert_equal "RanaParvaShop", one_merch[:name]
-  # end
+  def test_find_by_id
+    merchant = @mr.find_by_id(12336739)
+    assert_equal "RanaParvaShop", merchant.name
+  end
   # 
   # def test_find_by_name
   #   one_merch = @new_repository.find_by_name("RanaParvaShop")
