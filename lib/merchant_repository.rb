@@ -17,21 +17,28 @@ class MerchantRepository
     merchants.find { |m| m.id == id}
   end
 
-  # def inspect
-  #   "#<#{self.class} #{@merchants.size} rows>"
-  # end
+  def find_by_name(name)
+    merchants.find { |m| m.name.downcase == name.downcase }
+  end
+  
+  def create(name)
+    id = current_id_max + 1
+    attributes = {
+      id: id,
+    }
+    merchant = Merchant.new(attributes.merge(name))
+    @merchants << merchant
+  end
+  
+  def inspect
+    "#<#{self.class} #{@merchants.size} rows>"
+  end
 
-
-  # def all
-  #   merchants
-  # end
+  def all
+    merchants
+  end
   # 
   # 
-  # def find_by_name(name)
-  #   merchants.find do |m|
-  #     m[:name].downcase == name.downcase
-  #   end
-  # end
   # 
   # def find_all_by_name(name)
   #   array = []
@@ -41,12 +48,9 @@ class MerchantRepository
   #   array
   # end
   # 
-  # def current_id_max
-  #   highest = merchants.max_by do |m|
-  #     m[:id]
-  #   end
-  #   highest[:id]
-  # end
+  def current_id_max
+    merchants.max_by(&:id).id
+  end
   # 
   # def create(name_hash)
   #   num = self.current_id_max + 1

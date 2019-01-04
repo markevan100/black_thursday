@@ -2,9 +2,9 @@ require_relative 'ruby_helper'
 
 class SalesEngine
 
-  attr_reader :merchant_repository
+  attr_reader :merchants
   def initialize(data)
-    @merchant_repository = build_merchants(data[:merchants])
+    @merchants = build_merchants(data[:merchants])
     # @items = build_items
   end
 

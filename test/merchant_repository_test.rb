@@ -7,7 +7,7 @@ class MerchantTest < Minitest::Test
       :items     => "./data/items.csv",
       :merchants => "./data/merchants.csv",
       })
-      @mr = se.merchant_repository
+      @mr = se.merchants
   end
   
   def test_merchant_respository_exists
@@ -26,11 +26,17 @@ class MerchantTest < Minitest::Test
     merchant = @mr.find_by_id(12336739)
     assert_equal "RanaParvaShop", merchant.name
   end
-  # 
-  # def test_find_by_name
-  #   one_merch = @new_repository.find_by_name("RanaParvaShop")
-  #   assert_equal 12336739, one_merch[:id]
-  # end
+  
+  def test_find_by_name
+    merchant = @mr.find_by_name("RanaParvaShop")
+    assert_equal 12336739, merchant.id
+  end
+  
+  def test_create_creates_another_merchant_instance
+    assert_equal 475, @mr.merchants.count
+    @mr.create({name: "Mark's Pinatas"})
+    assert_equal 476, @mr.merchants.count
+  end
   # 
   # def test_find_all_by_name
   #   assert_equal ["9LivesJewelry", "MarkThomasJewelry"], @new_repository.find_all_by_name("sJewelry")
@@ -45,11 +51,7 @@ class MerchantTest < Minitest::Test
   #   assert_equal 12337411, @new_repository.current_id_max
   # end
   # 
-  # def test_create_creates_another_merchant_instance
-  #   assert_equal 475, @new_repository.merchants.count
-  #   @new_repository.create("Mark's Pinatas")
-  #   assert_equal 476, @new_repository.merchants.count
-  # end
+
   # 
   # def test_create_new_instance_can_be_found_xx
   #   assert_equal [], @new_repository.find_all_by_name("MarksPinatas")
