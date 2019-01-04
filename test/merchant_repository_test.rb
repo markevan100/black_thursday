@@ -18,9 +18,9 @@ class MerchantTest < Minitest::Test
     assert_instance_of Merchant, @mr.merchants.first
   end
 
-  # def test_merchant_respository_has_a_merchant_attribute
-  #   assert_equal 12334105, @new_repository.merchants[0][:id]
-  # end
+  def test_merchant_respository_has_a_merchant_attribute
+    assert_equal 12334105, @mr.merchants.first.id
+  end
 
   # #These test find methods on the merchant_repository class
   # def test_find_by_id
