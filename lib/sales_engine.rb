@@ -13,11 +13,11 @@ class SalesEngine
 
   def merchants
     MerchantRepository.new(hash[:merchants])
-  end 
-
-  def items
-    ItemRepository.new(hash[:items])
   end
+
+  # def items
+  #   ItemRepository.new(hash[:items])
+  # end
 end
 
   #

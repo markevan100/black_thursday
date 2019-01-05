@@ -7,8 +7,8 @@ class MerchantRepository
   def initialize(filename)
     @merchants = []
 
-    CSV.foreach(filename, headers: true, :header_converters => :symbol, converters: :numeric) do |row|
-      merchant = Merchant.new(row.to_hash)
+    CSV.foreach(filename, headers: true, :header_converters => :symbol) do |row|
+      merchant = Merchant.new(row)
       @merchants << merchant
     end
   end
@@ -24,29 +24,29 @@ class MerchantRepository
 
   def find_by_id(id)
     merchants.find do |m|
-      m[:id] == id
+      m.id == id
     end
   end
 
   def find_by_name(name)
     merchants.find do |m|
-      m[:name].downcase == name.downcase
+      m.name.downcase == name.downcase
     end
   end
 
   def find_all_by_name(name)
     array = []
     merchants.find_all do |m|
-      array << m if m[:name].downcase.include?(name.downcase)
+      array << m if m.name.downcase.include?(name.downcase)
     end
     array
   end
 
   def current_id_max
     highest = merchants.max_by do |m|
-      m[:id]
+      m.id
     end
-    highest[:id]
+    highest.id
   end
 
   def create(name_hash)
@@ -61,14 +61,14 @@ class MerchantRepository
       @merchants << merchant
   end
 
-  def update(id, name)
-    @merchants.find do |m|
-      m[:name] = name if m[:id] == id
-    end
-  end
-
-  def delete(id)
-    @merchants.delete_if { |m| m[:id] == id }
-  end
+  # def update(id, name)
+  #   @merchants.find do |m|
+  #     m[:name] = name if m[:id] == id
+  #   end
+  # end
+  #
+  # def delete(id)
+  #   @merchants.delete_if { |m| m[:id] == id }
+  # end
 
 end
