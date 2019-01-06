@@ -23,13 +23,13 @@ class ItemRepository
 
   def find_by_id(id)
     items.find do |i|
-      i[:id] == id
+      i.id == id
     end
   end
 
   def find_by_name(name)
     items.find do |i|
-      i[:name] == name
+      i.name == name
     end
   end
 
@@ -37,7 +37,7 @@ class ItemRepository
   def find_all_with_description(description)
     array = []
     items.find_all do |i|
-      array << i if i[:description].downcase.include?(description.downcase)
+      array << i if i.description.downcase.include?(description.downcase)
     end
     array
   end
@@ -45,7 +45,7 @@ class ItemRepository
   def find_all_by_price(price)
     array = []
     items.find_all do |i|
-      array << i if i[:unit_price] == (price.to_i * 100)
+      array << i if i.unit_price == (price.to_i * 100)
     end
     array
   end
@@ -53,7 +53,7 @@ class ItemRepository
   def find_all_by_price_in_range(price_range)
     array = []
     items.find_all do |i|
-      array << i if i[:unit_price] >= (price_range.min.to_i * 100) && i[:unit_price] <= (price_range.max.to_i * 100)
+      array << i if i.unit_price >= (price_range.min.to_i * 100) && i.unit_price <= (price_range.max.to_i * 100)
     end
     array
   end
@@ -61,35 +61,46 @@ class ItemRepository
   def find_all_by_merchant_id(merchant_id)
     array = []
     items.find_all do |i|
-      array << i if i[:merchant_id] == merchant_id
+      array << i if i.merchant_id == merchant_id
     end
     array
   end
 
   def current_id_max
     highest = @items.max_by do |i|
-      i[:id]
+      i.id
     end
-    highest[:id]
+    highest.id
   end
 
-  def create(attributes)
-    @items.push(Item.new(attributes))
+  def create(some_attributes)
+    num = self.current_id_max + 1
+    attributes = {
+      id: num,
+      name: some_attributes[:name],
+      description: some_attributes[:description],
+      created_at: some_attributes[:created_at],
+      updated_at: some_attributes[:updated_at],
+      unit_price: some_attributes[:unit_price],
+      merchant_id: some_attributes[:merchant_id]
+    }
+      item = Item.new(attributes)
+      @items << item
   end
 
-  def update(id, name, description, unit_price, merchant_id)
+  def update(id, some_attributes)
     @items.find do |i|
-      if i[:id] == id
-        i[:name] = name
-        i[:description] = description
-        i[:unit_price] = unit_price
-        i[:merchant_id] = merchant_id
+      if i.id == id
+        i.name = some_attributes[:name] if some_attributes[:name] != nil
+        i.description = some_attributes[:description] if some_attributes[:description] != nil
+        i.unit_price = some_attributes[:unit_price] if some_attributes[:unit_price] != nil
+        i.updated_at = Time.now
       end
     end
   end
 
   def delete(id)
-    @items.delete_if { |i| i[:id] == id }
+    @items.delete_if { |i| i.id == id }
   end
 
 end

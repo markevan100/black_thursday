@@ -61,14 +61,14 @@ class MerchantRepository
       @merchants << merchant
   end
 
-  # def update(id, name)
-  #   @merchants.find do |m|
-  #     m[:name] = name if m[:id] == id
-  #   end
-  # end
-  #
-  # def delete(id)
-  #   @merchants.delete_if { |m| m[:id] == id }
-  # end
+  def update(id, attributes)
+    @merchants.find do |m|
+      m.name = attributes[:name] if m.id == id
+    end
+  end
+
+  def delete(id)
+    @merchants.delete_if { |m| m.id == id }
+  end
 
 end

@@ -1,35 +1,18 @@
-class Item < Hash
+class Item
 
+  attr_accessor :id, :name, :description, :created_at, :updated_at, :unit_price, :merchant_id
   def initialize(attributes)
-    self.merge!(attributes)
-  end
-
-  def id
-    self[:id]
-  end
-
-  def name
-    self[:name]
-  end
-
-  def description
-    self[:description]
-  end
-
-  def unit_price
-    self[:unit_price]
-  end
-
-  def created_at
-    self[:created_at]
-  end
-
-  def updated_at
-    self[:updated_at]
+    @id = attributes[:id]
+    @name = attributes[:name]
+    @description = attributes[:description]
+    @created_at = attributes[:created_at]
+    @updated_at = attributes[:updated_at]
+    @unit_price = attributes[:unit_price]
+    @merchant_id = attributes[:merchant_id]
   end
 
   def unit_price_to_dollars
-    self[:unit_price].to_f
+    @unit_price.to_f
   end
 
 end
