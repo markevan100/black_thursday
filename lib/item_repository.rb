@@ -45,7 +45,7 @@ class ItemRepository
   def find_all_by_price(price)
     array = []
     items.find_all do |i|
-      array << i if i.unit_price == (price.to_i * 100)
+      array << i if i.unit_price == (price.to_i)
     end
     array
   end
@@ -53,7 +53,7 @@ class ItemRepository
   def find_all_by_price_in_range(price_range)
     array = []
     items.find_all do |i|
-      array << i if i.unit_price >= (price_range.min.to_i * 100) && i.unit_price <= (price_range.max.to_i * 100)
+      array << i if i.unit_price >= (price_range.min.to_i) && i.unit_price <= (price_range.max.to_i)
     end
     array
   end
@@ -79,8 +79,8 @@ class ItemRepository
       id: num,
       name: some_attributes[:name],
       description: some_attributes[:description],
-      created_at: some_attributes[:created_at],
-      updated_at: some_attributes[:updated_at],
+      created_at: some_attributes[:created_at].to_s,
+      updated_at: some_attributes[:updated_at].to_s,
       unit_price: some_attributes[:unit_price],
       merchant_id: some_attributes[:merchant_id]
     }

@@ -2,11 +2,15 @@ require_relative 'ruby_helper'
 
 class SalesEngine
 
-  attr_reader :file_paths, :merchants, :items
+  attr_reader :merchants, :items
+  # attr_reader :file_paths, :merchants, :items
   def initialize(file_paths)
-    @file_paths = file_paths
-    @merchants = MerchantRepository.new(file_paths[:merchants])
-    @items = ItemRepository.new(file_paths[:items])
+    # @file_paths = file_paths
+    # @merchants = MerchantRepository.new(file_paths[:merchants])
+    # @items = ItemRepository.new(file_paths[:items])
+    # @file_paths = file_paths
+    @merchants ||= MerchantRepository.new(file_paths[:merchants])
+    @items ||= ItemRepository.new(file_paths[:items])
   end
 
   def self.from_csv(file_paths)
