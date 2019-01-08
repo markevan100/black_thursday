@@ -26,19 +26,22 @@ class SalesEngineTest < Minitest::Test
     object_id = @se.items.object_id
     assert_equal object_id, @se.items.object_id
   end
-end
 
+  def test_analyst_exists
+    analyst = @se.analyst
+    assert_instance_of SalesAnalyst, analyst
+  end
 
+  #SalesAnalyst tests
+  def test_average_items_per_merchant
+    expected = @se.analyst.average_items_per_merchant
+    assert_equal 2.88, expected
+    assert_instance_of Float, expected
+  end
 
-
-# def test_from_csv_sets_a_hash
-#   se = SalesEngine.new
-#   se.from_csv({:items => "one item"})
-#   assert_equal "one item", se[:items]
-# end
-
-
-  # def test_sales_engine_exists
-  #   se = SalesEngine.new
-  #   assert_instance_of SalesEngine, se
+  # def test_average_items_per_merchant_standard_deviation
+  #   expected = @se.analyst.average_items_per_merchant_standard_deviation
+  #   assert_equal 3.26, expected
+  #   assert_instance_of Float, expected
   # end
+end
