@@ -43,4 +43,16 @@ class SalesAnalyst
     end
     return second_array
   end
+
+  def average_item_price_for_merchant(merchant_id)
+    items_array = items.find_all_by_merchant_id(merchant_id)
+    price_array = []
+    items_array.each do |i|
+      price_array << i.unit_price
+    end
+    average = price_array.inject(:+) / price_array.length
+    y = average.to_f.round(2)
+    x = (y * 100).to_i
+    BigDecimal.new(x)/100
+  end
 end

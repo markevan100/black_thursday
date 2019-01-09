@@ -48,6 +48,12 @@ class SalesEngineTest < Minitest::Test
   def test_merchants_with_high_item_count_returns_merchants_more_than_one_standard_deviation
     expected = @se.analyst.merchants_with_high_item_count
     assert_equal 52, expected.length
-    #assert_instance_of Merchant, expected.first.class
   end
+
+  def test_average_item_price_for_merchant_returns_the_average_item_price
+      merchant_id = 12334105
+      expected = @se.analyst.average_item_price_for_merchant(merchant_id)
+
+      assert_equal 16.66, expected
+    end
 end
