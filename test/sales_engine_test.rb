@@ -39,9 +39,15 @@ class SalesEngineTest < Minitest::Test
     assert_instance_of Float, expected
   end
 
-  # def test_average_items_per_merchant_standard_deviation
-  #   expected = @se.analyst.average_items_per_merchant_standard_deviation
-  #   assert_equal 3.26, expected
-  #   assert_instance_of Float, expected
-  # end
+  def test_average_items_per_merchant_standard_deviation
+    expected = @se.analyst.average_items_per_merchant_standard_deviation
+    assert_equal 3.26, expected
+    assert_instance_of Float, expected
+  end
+
+  def test_merchants_with_high_item_count_returns_merchants_more_than_one_standard_deviation
+    expected = @se.analyst.merchants_with_high_item_count
+    assert_equal 52, expected.length
+    #assert_instance_of Merchant, expected.first.class
+  end
 end
