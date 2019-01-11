@@ -15,7 +15,7 @@ class SalesAnalyst
   def average_items_per_merchant_standard_deviation
     blank_array = []
     uniq_merch_ids.each do |n|
-      blank_array << uniq_merch_ids.count(n)
+      blank_array << non_unique_merch_ids.count(n)
     end
     mean = blank_array.inject(:+) / blank_array.length.to_f
     var_sum = blank_array.map{|n| (n-mean)**2}.inject(:+).to_f
