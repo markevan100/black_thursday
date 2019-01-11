@@ -9,13 +9,13 @@ class SalesAnalyst
   end
 
   def average_items_per_merchant
-    (items.all.count / get_uniq_item_merch_ids.count.to_f).round(2)
+    (items.all.count / uniq_merch_ids.count.to_f).round(2)
   end
 
   def average_items_per_merchant_standard_deviation
     blank_array = []
-    get_uniq_item_merch_ids.each do |n|
-      blank_array << array.count(n)
+    uniq_merch_ids.each do |n|
+      blank_array << uniq_merch_ids.count(n)
     end
     mean = blank_array.inject(:+) / blank_array.length.to_f
     var_sum = blank_array.map{|n| (n-mean)**2}.inject(:+).to_f
@@ -25,8 +25,8 @@ class SalesAnalyst
 
   def merchants_with_high_item_count
     merchants_ids_with_more_than_seven_items = []
-    get_uniq_item_merch_ids.each do |n|
-      merchants_ids_with_more_than_seven_items << n if array.count(n) >= 7
+    uniq_merch_ids.each do |merch|
+      merchants_ids_with_more_than_seven_items << merch if non_unique_merch_ids.count(merch) >= 7
     end
     high_item_count_merch_objects = []
 
@@ -71,7 +71,11 @@ class SalesAnalyst
       @merchants.all.map(&:id)
     end
     
-    def get_uniq_item_merch_ids
+    def non_unique_merch_ids
+      items.all.map { |i| i.merchant_id }
+    end
+    
+    def uniq_merch_ids
       items.all.map { |i| i.merchant_id }.uniq
     end
 end
