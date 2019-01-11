@@ -9,17 +9,12 @@ class SalesAnalyst
   end
 
   def average_items_per_merchant
-    array = []
-    items.all.each { |i| array << i.merchant_id }
-    (array.count / array.uniq.count.to_f).round(2)
+    (items.all.count / get_uniq_item_merch_ids.count.to_f).round(2)
   end
 
   def average_items_per_merchant_standard_deviation
-    array = []
-    items.all.each { |i| array << i.merchant_id }
-    uni_array = array.uniq
     blank_array = []
-    uni_array.each do |n|
+    get_uniq_item_merch_ids.each do |n|
       blank_array << array.count(n)
     end
     mean = blank_array.inject(:+) / blank_array.length.to_f
@@ -29,19 +24,16 @@ class SalesAnalyst
   end
 
   def merchants_with_high_item_count
-    array = []
-    items.all.each { |i| array << i.merchant_id }
-    uni_array = array.uniq
-    blank_array = []
-    uni_array.each do |n|
-      blank_array << n if array.count(n) >= 7
+    merchants_ids_with_more_than_seven_items = []
+    get_uniq_item_merch_ids.each do |n|
+      merchants_ids_with_more_than_seven_items << n if array.count(n) >= 7
     end
-    second_array = []
+    high_item_count_merch_objects = []
 
-    blank_array.each do |i|
-      second_array << merchants.find_by_id(i)
+    merchants_ids_with_more_than_seven_items.each do |i|
+      high_item_count_merch_objects << merchants.find_by_id(i)
     end
-    return second_array
+    return high_item_count_merch_objects
   end
 
   def average_item_price_for_merchant(merchant_id)
@@ -57,12 +49,8 @@ class SalesAnalyst
   end
 
   def average_average_price_per_merchant
-    merch_id_array = []
-    merchants.all.each do |m|
-      merch_id_array << m.id
-    end
     averages_array = []
-    merch_id_array.each do |m_id|
+    all_merchant_ids.each do |m_id|
       items_array = items.find_all_by_merchant_id(m_id)
       price_array = []
       items_array.each do |i|
@@ -76,4 +64,14 @@ class SalesAnalyst
     x = (y * 100).to_i
     BigDecimal.new(x)/100
   end
+  
+  private
+  
+    def all_merchant_ids
+      @merchants.all.map(&:id)
+    end
+    
+    def get_uniq_item_merch_ids
+      items.all.map { |i| i.merchant_id }.uniq
+    end
 end
