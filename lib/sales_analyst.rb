@@ -22,10 +22,7 @@ class SalesAnalyst
     uni_array.each do |n|
       blank_array << array.count(n)
     end
-    mean = blank_array.inject(:+) / blank_array.length.to_f
-    var_sum = blank_array.map{|n| (n-mean)**2}.inject(:+).to_f
-    sample_variance = var_sum / (blank_array.length - 1)
-    Math.sqrt(sample_variance).round(2)
+    standard_deviation(blank_array)
   end
 
   def merchants_with_high_item_count
@@ -75,5 +72,28 @@ class SalesAnalyst
     y = total_average.to_f.round(2)
     x = (y * 100).to_i
     BigDecimal.new(x)/100
+  end
+
+  def golden_items
+    item_price_array = []
+    items.all.each { |i| item_price_array << i.unit_price }
+    item_mean = mean(item_price_array)
+    strd_dev = standard_deviation(item_price_array)
+    golden_items = []
+    golden_price = item_mean + (strd_dev * 2)
+    items.all.each { |i| golden_items << i if i.unit_price > golden_price}
+    golden_items
+  end
+
+  def mean(array)
+    mean = array.inject(:+) / array.length.to_f
+  end
+
+
+  def standard_deviation(array)
+    mean = array.inject(:+) / array.length.to_f
+    var_sum = array.map{|n| (n-mean)**2}.inject(:+).to_f
+    sample_variance = var_sum / (array.length - 1)
+    Math.sqrt(sample_variance).round(2)
   end
 end

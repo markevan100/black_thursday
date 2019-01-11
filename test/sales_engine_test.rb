@@ -66,10 +66,10 @@ class SalesEngineTest < Minitest::Test
       assert_instance_of BigDecimal, expected
     end
 
-    # def golden_items_returns_items_that_are_two_standard_deviations_above_the_average_price
-    # expected = sales_analyst.golden_items
-    #
-    # expect(expected.length).to eq 5
-    # expect(expected.first.class).to eq Item
-    # end
+    def test_golden_items_returns_items_that_are_two_standard_deviations_above_the_average_price
+    expected = @se.analyst.golden_items
+
+    assert_equal 5, expected.length
+    assert_instance_of Item, expected.first
+    end
 end
