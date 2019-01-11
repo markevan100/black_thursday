@@ -9,44 +9,28 @@ class SalesAnalyst
   end
 
   def average_items_per_merchant
-    array = []
-    items.all.each { |i| array << i.merchant_id }
-    (array.count / array.uniq.count.to_f).round(2)
+    (merchant_ids.count / merchant_ids.uniq.count.to_f).round(2)
   end
 
   def average_items_per_merchant_standard_deviation
-    array = []
-    items.all.each { |i| array << i.merchant_id }
-    uni_array = array.uniq
-    blank_array = []
-    uni_array.each do |n|
-      blank_array << array.count(n)
-    end
-    standard_deviation(blank_array)
+    items_per_merchant = []
+    unique_merchants.each { |n| items_per_merchant << merchant_ids.count(n) }
+    standard_deviation(items_per_merchant)
   end
 
   def merchants_with_high_item_count
-    array = []
-    items.all.each { |i| array << i.merchant_id }
-    uni_array = array.uniq
-    blank_array = []
-    uni_array.each do |n|
-      blank_array << n if array.count(n) >= 7
-    end
-    second_array = []
+    high_item_merchant_ids = []
+    unique_merchants.each { |n| high_item_merchant_ids << n if merchant_ids.count(n) >= 7 }
 
-    blank_array.each do |i|
-      second_array << merchants.find_by_id(i)
-    end
-    return second_array
+    merchants_for_high_item = []
+    high_item_merchant_ids.each { |i| merchants_for_high_item << merchants.find_by_id(i) }
+    merchants_for_high_item
   end
 
   def average_item_price_for_merchant(merchant_id)
     items_array = items.find_all_by_merchant_id(merchant_id)
     price_array = []
-    items_array.each do |i|
-      price_array << i.unit_price
-    end
+    items_array.each { |i| price_array << i.unit_price }
     average = price_array.inject(:+) / price_array.length
     y = average.to_f.round(2)
     x = (y * 100).to_i
@@ -54,24 +38,16 @@ class SalesAnalyst
   end
 
   def average_average_price_per_merchant
-    merch_id_array = []
-    merchants.all.each do |m|
-      merch_id_array << m.id
-    end
     averages_array = []
-    merch_id_array.each do |m_id|
+    unique_merchants.map do |m_id|
       items_array = items.find_all_by_merchant_id(m_id)
       price_array = []
-      items_array.each do |i|
+      items_array.select do |i|
         price_array << i.unit_price
       end
-      average = price_array.inject(:+) / price_array.length
-      averages_array << average
+      averages_array << mean(price_array)
     end
-    total_average = averages_array.inject(:+) / averages_array.length
-    y = total_average.to_f.round(2)
-    x = (y * 100).to_i
-    BigDecimal.new(x)/100
+    BigDecimal.new((mean(averages_array).to_f.round(2) * 100).to_i)/100
   end
 
   def golden_items
@@ -85,10 +61,21 @@ class SalesAnalyst
     golden_items
   end
 
+  #Helper methods
+  private
+  def merchant_ids
+    array_of_merchant_ids = []
+    items.all.each { |i| array_of_merchant_ids << i.merchant_id }
+    array_of_merchant_ids
+  end
+
+  def unique_merchants
+    merchant_ids.uniq
+  end
+
   def mean(array)
     mean = array.inject(:+) / array.length.to_f
   end
-
 
   def standard_deviation(array)
     mean = array.inject(:+) / array.length.to_f
