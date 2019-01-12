@@ -7,85 +7,56 @@ class ItemTest < Minitest::Test
   :items     => './data/items.csv',
   :merchants => './data/merchants.csv',
 })
-    @item = Item.new
-    @new_repository = ItemRepository.new(se[:items])
+    #@item = Item.new
+    @new_repository = se.items
   end
 
-  def test_item_exists
-    assert_instance_of Item, @item
+  def test_id_returns_the_id
+    item_one = @new_repository.all.first
+    assert_equal 263395237, item_one.id
+
+    item_two = @new_repository.all.last
+    assert_equal item_two.id, 263567474
   end
 
-  def test_item_new_item
-    new_item = Item.new
-    assert_instance_of Item, new_item
+  def name_returns_the_name
+    item_one = @new_repository.all.first
+    assert_equal "510+ RealPush Icon Set", item_one.name
+
+    item_two = @new_repository.all.last
+    assert_equal "Minty Green Knit Crochet Infinity Scarf", item_two.name
   end
 
-  def test_item_is_a_hash
-    @item[:id] = 123456
-    assert_equal 123456, @item[:id]
+  def test_description_returns_the_description
+    item_one = @new_repository.all.first
+
+    assert_equal String, item_one.description.class
+    assert_equal 2237, item_one.description.length
   end
 
-  #These are tests for the item_repository class
-  def test_item_respository_exists
-    assert_instance_of ItemRepository, @new_repository
+  def test_unit_price_returns_the_unit_price
+    item_one = @new_repository.all.first
+
+    assert_equal 12.00, item_one.unit_price
+    assert_equal BigDecimal, item_one.unit_price.class
   end
 
-  def test_item_respository_has_a_item_attribute
-    assert_equal 263395237, @new_repository.items[0][:id]
+  def created_at_returns_the_Time_the_item_was_created
+    item_one = @new_repository.all.first
+    assert_equal Time.parse("2016-01-11 09:34:06 UTC"), item_one.created_at
+    assert_equal Time, item_one.created_at.class
   end
 
-  #These test find methods on the merchant_repository class
-  def test_find_by_id
-    one_item = @new_repository.find_by_id(263401265)
-    assert_equal "Oak Bowl", one_item[:name]
+  def test_updated_at_returns_the_Time_the_item_was_last_updated
+    item_one = @new_repository.all.first
+
+    assert_equal Time.parse("2007-06-04 21:35:10 UTC"), item_one.updated_at
+    assert_equal Time, item_one.updated_at.class
   end
-  #
-  def test_find_by_name
-    one_item = @new_repository.find_by_name("Oak Bowl")
-    assert_equal 263401265, one_item[:id]
-  end
-  #
-  def test_find_all_by_name
-    assert_equal ["Spalted Sycamore Bowl", "Field Maple Bowl"], @new_repository.find_all_by_name("e Bowl")
-  end
-  #
-  def test_find_all_by_name_no_matches_returns_empty_array
-    assert_equal [], @new_repository.find_all_by_name("thisdoesntexist")
-  end
-  #
-  # #These are tests for manipulating item instances of the item_repository class
-  def test_current_highest_id
-    assert_equal 263567474, @new_repository.current_id_max
-  end
-  #
-  def test_create_creates_another_item_instance
-    assert_equal 1367, @new_repository.items.count
-    @new_repository.create("Pinata", "A Pinata!", 1500, 12345678)
-    assert_equal 1368, @new_repository.items.count
-  end
-  #
-  def test_create_new_instance_can_be_found
-    assert_equal [], @new_repository.find_all_by_name("Pinata")
-    @new_repository.create("Pinata", "A Pinata!", 1500, 12345678)
-    one_item = @new_repository.find_by_name("Pinata")
-    assert_equal 263567475, one_item[:id]
-  end
-  #
-  def test_update_changes_name
-    @new_repository.create("Pinata", "A Pinata!", 1500, 12345678)
-    one_item = @new_repository.find_by_name("Pinata")
-    assert_equal 263567475, one_item[:id]
-    @new_repository.update(263567475, "Pinata Ornament", "A Christmas Pinata!", 2000, 12345678)
-    update_item = @new_repository.find_by_name("Pinata Ornament")
-    assert_equal 263567475, update_item[:id]
-    assert_nil @new_repository.find_by_name("Pinata")
-  end
-  #
-  def test_delete_an_instance_of_a_item_by_id
-    @new_repository.create("Pinata", "A Pinata!", 1500, 12345678)
-    one_item = @new_repository.find_by_name("Pinata")
-    assert_equal 263567475, one_item[:id]
-    @new_repository.delete(263567475)
-    assert_nil @new_repository.find_by_name("Pinata")
+
+  def test_unit_price_to_dollars_returns_price_as_Float
+    expected = @new_repository.find_by_id(263397059)
+    assert_equal 130.0, expected.unit_price_to_dollars
+    assert_equal Float, expected.unit_price_to_dollars.class
   end
 end
