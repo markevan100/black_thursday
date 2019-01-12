@@ -17,7 +17,6 @@ class MerchantRepositoryTest < Minitest::Test
   def test_merchant_respository_has_a_merchant_attribute
 
     assert_equal Array, @new_repository.merchants.class
-    #assert_equal 12334105, @new_repository.merchants[0][:id]
   end
 
   def test_merchant_repository_has_merchants
@@ -26,7 +25,6 @@ class MerchantRepositoryTest < Minitest::Test
   #
   # #These test find methods on the merchant_repository class
   def test_find_by_id
-    #binding.pry
     one_merch = @new_repository.find_by_id(12336739)
     assert_equal "RanaParvaShop", one_merch.name
   end
