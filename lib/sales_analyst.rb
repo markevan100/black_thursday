@@ -51,7 +51,7 @@ class SalesAnalyst
   end
 
   def mean(array)
-    mean = array.inject(:+) / array.length.to_f
+    array.inject(:+) / array.length.to_f
   end
 
   def standard_deviation(array)
