@@ -1,0 +1,13 @@
+# gem 'minitest', '~> 5.2'
+# require 'minitest/autorun'
+# require 'minitest/pride'
+require 'bigdecimal'
+require 'pry'
+require 'csv'
+
+require_relative 'item'
+require_relative 'merchant'
+require_relative 'merchant_repository'
+require_relative 'item_repository'
+require_relative 'sales_engine'
+require_relative 'sales_analyst'
