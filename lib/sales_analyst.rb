@@ -1,11 +1,16 @@
 require_relative 'ruby_helper'
+require_relative 'merchant_repository'
+require_relative 'item_repository'
+#require_relative 'sales_engine'
+require_relative 'invoice_repository'
 
 class SalesAnalyst
 
-  attr_reader :merchants, :items
-  def initialize(merchants, items)
+  attr_reader :merchants, :items, :invoices
+  def initialize(merchants, items, invoices)
     @merchants = merchants
     @items = items
+    @invoices = invoices
   end
 
   def average_items_per_merchant
@@ -22,14 +27,14 @@ class SalesAnalyst
 
   def average_item_price_for_merchant(merchant_id)
     price_array = items.find_all_by_merchant_id(merchant_id).map { |i| i.unit_price }
-    BigDecimal.new((mean(price_array).to_f.round(2) * 100).to_i)/100
+    Kernel.BigDecimal((mean(price_array).to_f.round(2) * 100).to_i)/100
   end
 
   def average_average_price_per_merchant
     averages_array = unique_merchants.map do |m_id|
       mean(items.find_all_by_merchant_id(m_id).map { |i| i.unit_price })
     end
-    BigDecimal.new((mean(averages_array).to_f.round(2) * 100).to_i)/100
+    Kernel.BigDecimal((mean(averages_array).to_f.round(2) * 100).to_i)/100
   end
 
   def golden_items
@@ -40,6 +45,19 @@ class SalesAnalyst
     items.all.select { |i| i.unit_price > golden_price }
   end
 
+  def average_invoices_per_merchant
+    all_m_ids_array = invoices.all.map { |i| i.merchant_id }
+    (all_m_ids_array.count / all_m_ids_array.uniq.count.to_f).round(2)
+  end
+
+  def average_invoices_per_merchant_standard_deviation
+    all_m_ids_array = invoices.all.map { |i| i.merchant_id }
+    standard_deviation(all_m_ids_array.uniq.map { |n| all_m_ids_array.count(n) })
+  end
+
+  def top_merchants_by_invoice_count
+    
+  end
   #Helper methods
   private
   def merchant_ids
@@ -51,7 +69,7 @@ class SalesAnalyst
   end
 
   def mean(array)
-    mean = array.inject(:+) / array.length.to_f
+    array.inject(:+) / array.length.to_f
   end
 
   def standard_deviation(array)
