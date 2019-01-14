@@ -7,7 +7,7 @@ class ItemTest < Minitest::Test
     :items     => './data/items.csv',
     :merchants => './data/merchants.csv',
     :invoices => './data/invoices.csv',
-  })
+  }) 
     @new_repository = se.items
   end
 
