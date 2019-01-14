@@ -17,7 +17,6 @@ class MerchantRepository
     "#<#{self.class} #{@merchants.size} rows>"
   end
 
-
   def all
     merchants
   end
