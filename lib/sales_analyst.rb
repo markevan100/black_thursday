@@ -14,15 +14,15 @@ class SalesAnalyst
   end
 
   def average_items_per_merchant
-    (merchant_ids.count / merchant_ids.uniq.count.to_f).round(2)
+    (merchant_ids_items.count / merchant_ids_items.uniq.count.to_f).round(2)
   end
 
   def average_items_per_merchant_standard_deviation
-    standard_deviation(unique_merchants.map { |n| merchant_ids.count(n) })
+    standard_deviation(unique_merchants.map { |n| merchant_ids_items.count(n) })
   end
 
   def merchants_with_high_item_count
-    (unique_merchants.select { |n| merchant_ids.count(n) >= 7 }).map { |i| merchants.find_by_id(i) }
+    (unique_merchants.select { |n| merchant_ids_items.count(n) >= 7 }).map { |i| merchants.find_by_id(i) }
   end
 
   def average_item_price_for_merchant(merchant_id)
@@ -56,16 +56,48 @@ class SalesAnalyst
   end
 
   def top_merchants_by_invoice_count
-    
+    invoice_array = unique_merchants.map { |n| merchant_ids_invoices.count(n) }
+    invoice_mean = mean(invoice_array)
+    strd_dev = standard_deviation(invoice_array)
+    top_merch = invoice_mean + (strd_dev * 2)
+    top_merchant_ids = unique_merchants.select { |i| merchant_ids_invoices.count(i) >= top_merch}
+    top_merchant_ids.map { |i| merchants.find_by_id(i) }
+  end
+
+  def bottom_merchants_by_invoice_count
+    invoice_array = unique_merchants.map { |n| merchant_ids_invoices.count(n) }
+    invoice_mean = mean(invoice_array)
+    strd_dev = standard_deviation(invoice_array)
+    top_merch = invoice_mean - (strd_dev * 2)
+    top_merchant_ids = unique_merchants.select { |i| merchant_ids_invoices.count(i) <= top_merch}
+    top_merchant_ids.map { |i| merchants.find_by_id(i) }
+  end
+
+  def top_days_by_invoice_count
+    invoice_days_array = invoices.all.map { |i| i.created_at.strftime('%A')}
+    number_of_each_day_arrray = invoice_days_array.uniq.map { |d| invoice_days_array.count(d) }
+    invoice_days_mean = mean(number_of_each_day_arrray)
+    strd_dev = standard_deviation(number_of_each_day_arrray)
+    top_days = invoice_days_mean + strd_dev
+    invoice_days_array.uniq.select { |d| top_days < invoice_days_array.count(d) }
+  end
+
+  def invoice_status(status)
+    status_array = invoices.all.select { |i| i.status == status }
+    ((status_array.count / invoices.all.count.to_f) * 100).round(2)
   end
   #Helper methods
   private
-  def merchant_ids
+  def merchant_ids_items
     items.all.map { |i| i.merchant_id }
   end
 
+  def merchant_ids_invoices
+    invoices.all.map { |i| i.merchant_id }
+  end
+
   def unique_merchants
-    merchant_ids.uniq
+    merchant_ids_items.uniq
   end
 
   def mean(array)

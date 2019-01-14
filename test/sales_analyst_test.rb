@@ -70,35 +70,35 @@ class SalesAnalystTest < Minitest::Test
     expected = @an.top_merchants_by_invoice_count
 
     assert_equal 12, expected.length
-    assert_instance_of Merchant, expected
+    assert_instance_of Merchant, expected[0]
   end
-  #
-  #   def test_bottom_merchants_by_invoice_count_returns_merchants_that_are_two_standard_deviations_below_the_mean
-  #     expected = @an.bottom_merchants_by_invoice_count
-  #
-  #     assert_equal 4, expected.length
-  #     assert_instance_of Merchant, expected
-  #   end
-  #
-  #   def test_top_days_by_invoice_count_returns_days_with_an_invoice_count_more_than_one_standard_deviation_above_the_mean
-  #     expected = @an.top_days_by_invoice_count
-  #
-  #     assert_equal 1, expected.length
-  #     assert_equal "Wednesday", expected.first
-  #     assert_instance_of String, expected
-  #   end
-  #
-  #   def test_invoice_status_returns_the_percentage_of_invoices_with_given_status
-  #     expected = @an.invoice_status(:pending)
-  #
-  #     assert_equal 29.55, expected
-  #
-  #     expected = @an.invoice_status(:shipped)
-  #
-  #     assert_equal 56.95, expected
-  #
-  #     expected = @an.invoice_status(:returned)
-  #
-  #     assert_equal 13.5, expected
-  #   end
+
+    def test_bottom_merchants_by_invoice_count_returns_merchants_that_are_two_standard_deviations_below_the_mean
+      expected = @an.bottom_merchants_by_invoice_count
+
+      assert_equal 4, expected.length
+      assert_instance_of Merchant, expected[0]
+    end
+
+    def test_top_days_by_invoice_count_returns_days_with_an_invoice_count_more_than_one_standard_deviation_above_the_mean
+      expected = @an.top_days_by_invoice_count
+
+      assert_equal 1, expected.length
+      assert_equal "Wednesday", expected.first
+      assert_instance_of String, expected.first
+    end
+
+    def test_invoice_status_returns_the_percentage_of_invoices_with_given_status
+      expected = @an.invoice_status(:pending)
+
+      assert_equal 29.55, expected
+
+      expected = @an.invoice_status(:shipped)
+
+      assert_equal 56.95, expected
+
+      expected = @an.invoice_status(:returned)
+
+      assert_equal 13.5, expected
+    end
 end
