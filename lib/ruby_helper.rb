@@ -7,7 +7,4 @@ require 'csv'
 
 require_relative 'item'
 require_relative 'merchant'
-require_relative 'merchant_repository'
-require_relative 'item_repository'
-require_relative 'sales_engine'
-require_relative 'sales_analyst'
+require_relative 'invoice'

@@ -4,9 +4,10 @@ class ItemRepositoryTest < Minitest::Test
 
   def setup
     se = SalesEngine.from_csv({
-  :items     => "./data/items.csv",
-  :merchants => "./data/merchants.csv",
-})
+    :items     => "./data/items.csv",
+    :merchants => "./data/merchants.csv",
+    :invoices => "./data/invoices.csv",
+  })
     @new_repository = se.items
   end
 
@@ -47,7 +48,7 @@ class ItemRepositoryTest < Minitest::Test
   end
 
   def test_find_all_by_price
-    price = BigDecimal.new(25)
+    price = Kernel.BigDecimal(25)
     expected = @new_repository.find_all_by_price(price)
 
     assert_equal 79, expected.length
@@ -76,7 +77,7 @@ class ItemRepositoryTest < Minitest::Test
     attributes = {
         name: "Capita Defenders of Awesome 2018",
         description: "This board both rips and shreds",
-        unit_price: BigDecimal.new(399.99, 5),
+        unit_price: Kernel.BigDecimal(399.99, 5),
         created_at: Time.now,
         updated_at: Time.now,
         merchant_id: 25
