@@ -1,30 +1,47 @@
-  it "#id returns the invoice item id" do
-    expect(invoice_item.id).to eq 2345
-    expect(invoice_item.id.class).to eq Fixnum
+require_relative 'test_helper'
+
+class InvoiceItemTest < Minitest::Test
+
+  def setup
+    attributes = {
+        id: 2345,
+        item_id: 263562118,
+        invoice_id: 522,
+        unit_price: 847.87,
+        quantity: 7,
+        created_at: "2012-03-27 14:54:35 UTC",
+        updated_at: "2012-03-27 14:54:35 UTC"
+      }
+    @invoice_item = InvoiceItem.new(attributes)
   end
 
-  it "#item_id returns the item id" do
-    expect(invoice_item.item_id).to eq 263562118
-    expect(invoice_item.item_id.class).to eq Fixnum
+  def test_id_returns_the_invoice_item_id
+    assert_equal 2345, @invoice_item.id
+    assert_instance_of Integer, @invoice_item.id
   end
 
-  it "#invoice_id returns the invoice id" do
-    expect(invoice_item.invoice_id).to eq 522
-    expect(invoice_item.invoice_id.class).to eq Fixnum
+  def test_item_id_returns_the_item_id
+    assert_equal 263562118, @invoice_item.item_id
+    assert_instance_of Integer, @invoice_item.item_id
   end
 
-  it "#unit_price returns the unit price" do
-    expect(invoice_item.unit_price).to eq 847.87
-    expect(invoice_item.unit_price.class).to eq BigDecimal
+  def test_invoice_id_returns_the_invoice_id
+    assert_equal 522, @invoice_item.invoice_id
+    assert_instance_of Integer, @invoice_item.invoice_id
   end
 
-  it "#created_at returns a Time instance for the date the invoice item was created" do
-    expect(invoice_item.created_at).to eq Time.parse("2012-03-27 14:54:35 UTC")
-    expect(invoice_item.created_at.class).to eq Time
+  def test_unit_price_returns_the_unit_price
+    assert_equal 847.87, @invoice_item.unit_price
+    assert_instance_of BigDecimal, @invoice_item.unit_price
   end
 
-  it "#updated_at returns a Time instance for the date the invoice item was last updated" do
-    expect(invoice_item.updated_at).to eq Time.parse("2012-03-27 14:54:35 UTC")
-    expect(invoice_item.updated_at.class).to eq Time
+  def test_created_at_returns_a_Time_instance_for_the_date_the_invoice_item_was_created
+    assert_equal Time.parse("2012-03-27 14:54:35 UTC"), @invoice_item.created_at
+    assert_instance_of Time, @invoice_item.created_at
+  end
+
+  def test_updated_at_returns_a_Time_instance_for_the_date_the_invoice_item_was_last_updated
+    assert_equal Time.parse("2012-03-27 14:54:35 UTC"), @invoice_item.updated_at
+    assert_instance_of Time, @invoice_item.updated_at
   end
 end
