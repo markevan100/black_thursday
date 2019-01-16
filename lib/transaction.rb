@@ -17,5 +17,6 @@ class Transaction
     if string.length == 3
       string.prepend("0")
     end
+    string
   end
 end

@@ -17,7 +17,7 @@ class SalesEngine
     @invoice_items = InvoiceItemRepository.new(file_paths[:invoice_items])
     @customers = CustomerRepository.new(file_paths[:customers])
     @transactions = TransactionRepository.new(file_paths[:transactions])
-    @analyst = SalesAnalyst.new(@merchants, @items, @invoices, @invoices_items, @transactions, @customers)
+    @analyst = SalesAnalyst.new(@merchants, @items, @invoices, @invoice_items, @transactions, @customers)
   end
 
   def self.from_csv(file_paths)
