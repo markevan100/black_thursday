@@ -8,8 +8,10 @@ class InvoiceRepositoryTest < Minitest::Test
       :items     => "./data/items.csv",
       :merchants => "./data/merchants.csv",
       :invoice_items => "./data/invoice_items.csv",
+      :transactions => "./data/transactions.csv",
+      :customers => "./data/customers.csv",
     })
-    @se = se.invoices
+    @se = se.invoice_items
   end
 
   def test_all_returns_an_array_of_all_invoice_item_instances
@@ -83,15 +85,15 @@ class InvoiceRepositoryTest < Minitest::Test
     attributes = {
       quantity: 13
     }
-    @se.update(21831, attributes)
-    expected = @se.find_by_id(21831)
+    @se.update(21830, attributes)
+    expected = @se.find_by_id(21830)
     assert_equal 13, expected.quantity
-    assert_equal 7, expected.item_id
+    assert_equal 263519844, expected.item_id
   end
 
   def test_delete_deletes_the_specified_invoice
-    @se.delete(21831)
-    expected = @se.find_by_id(21831)
-    assert_nil expected 
+    @se.delete(21830)
+    expected = @se.find_by_id(21830)
+    assert_nil expected
   end
 end
