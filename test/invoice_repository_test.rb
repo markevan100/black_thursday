@@ -7,6 +7,9 @@ class InvoiceRepositoryTest < Minitest::Test
       :invoices => "./data/invoices.csv",
       :items     => "./data/items.csv",
       :merchants => "./data/merchants.csv",
+      :invoice_items => "./data/invoice_items.csv",
+      :transactions => "./data/transactions.csv",
+      :customers => "./data/customers.csv",
     })
     @new_repository = se.invoices
   end

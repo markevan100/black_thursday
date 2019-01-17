@@ -1,16 +1,21 @@
 require_relative 'ruby_helper'
 require_relative 'merchant_repository'
 require_relative 'item_repository'
-#require_relative 'sales_engine'
 require_relative 'invoice_repository'
+require_relative 'invoice_item_repository'
+require_relative 'customer_repository'
+require_relative 'transaction_repository'
 
 class SalesAnalyst
 
-  attr_reader :merchants, :items, :invoices
-  def initialize(merchants, items, invoices)
+  attr_reader :merchants, :items, :invoices, :invoice_items, :transactions, :customers
+  def initialize(merchants, items, invoices, invoice_items, transactions, customers)
     @merchants = merchants
     @items = items
     @invoices = invoices
+    @invoice_items = invoice_items
+    @transactions = transactions
+    @customers = customers
   end
 
   def average_items_per_merchant
@@ -85,6 +90,19 @@ class SalesAnalyst
   def invoice_status(status)
     status_array = invoices.all.select { |i| i.status == status }
     ((status_array.count / invoices.all.count.to_f) * 100).round(2)
+  end
+
+  def invoice_paid_in_full?(invoice_id)
+    trans = transactions.find_all_by_invoice_id(invoice_id)
+    if trans.count == 0
+      return false
+    end
+    trans.select { |t| t.result == :success }.length > 0
+  end
+
+  def invoice_total(invoice_id)
+    invoice_items_array = invoice_items.find_all_by_invoice_id(invoice_id)
+    invoice_items_array.map { |i| i.quantity * i.unit_price }.inject(:+)
   end
   #Helper methods
   private
