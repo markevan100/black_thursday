@@ -104,6 +104,148 @@ class SalesAnalyst
     invoice_items_array = invoice_items.find_all_by_invoice_id(invoice_id)
     invoice_items_array.map { |i| i.quantity * i.unit_price }.inject(:+)
   end
+
+  def total_revenue_by_date(date)
+    invoice_array = invoices.all.select do |i|
+      i.created_at.strftime("%m/%d/%Y") == date.strftime("%m/%d/%Y")
+    end
+    invoice_id_array = invoice_array.map { |i| i.id }
+    invoice_items_array = []
+    invoice_id_array.map do |i|
+        invoice_items_array << invoice_items.find_all_by_invoice_id(i)
+    end
+    invoice_items_array.flatten.map { |i| i.quantity * i.unit_price }.inject(:+)
+  end
+
+  def top_revenue_earners(x = 20)
+    hash = {}
+    unique_merchants.map do |m|
+      invoice_ids = []
+      invoices.all.each do |i|
+        if (i.merchant_id == m) && (invoice_paid_in_full?(i.id))
+          invoice_ids << i.id
+        end
+      end
+      #binding.pry
+      invoice_items_array = invoice_ids.map do |i|
+         invoice_items.find_all_by_invoice_id(i)
+      end
+      revenue = []
+      invoice_items_array.flatten.map do |i|
+         revenue << (i.quantity * i.unit_price)
+      end
+      rev_total = revenue.inject(:+)
+      if rev_total != nil
+        hash[rev_total] = merchants.find_by_id(m)
+      end
+    end
+    array_of_merchants = hash.sort_by {|k, v| k}.to_h.values.reverse
+    return array_of_merchants[0...x]
+  end
+
+  def merchants_ranked_by_revenue
+    hash = {}
+    unique_merchants.map do |m|
+      invoice_ids = []
+      invoices.all.each do |i|
+        if (i.merchant_id == m) && (invoice_paid_in_full?(i.id))
+          invoice_ids << i.id
+        end
+      end
+      #binding.pry
+      invoice_items_array = invoice_ids.map do |i|
+         invoice_items.find_all_by_invoice_id(i)
+      end
+      revenue = []
+      invoice_items_array.flatten.map do |i|
+         revenue << (i.quantity * i.unit_price)
+      end
+      rev_total = 0
+      rev_total += revenue.inject(:+) if revenue.inject(:+).class == BigDecimal
+      hash[rev_total] = merchants.find_by_id(m)
+    end
+    array_of_merchants = hash.sort_by {|k, v| k}.to_h.values.reverse
+    return array_of_merchants
+  end
+
+  def merchants_with_pending_invoices
+    pend_merch_ids = unique_merchants.select do |m|
+      merch_invoices = invoices.all.select { |i| i.merchant_id == m }
+      merch_invoice_ids = merch_invoices.map { |i| i.id }
+      no_suc = merch_invoice_ids.select do |i|
+        invoice_trans = transactions.all.select { |t| i == t.invoice_id }
+        suc = invoice_trans.select { |t| t.result == :success }
+        suc.length == 0
+      end
+      no_suc.length > 0
+    end
+    pend_merch_ids.map { |i| merchants.find_by_id(i) }
+  end
+
+  def merchants_with_only_one_item
+    merch_id_1 = unique_merchants.select do |m|
+      merch_items = items.all.select { |i| i.merchant_id == m }
+      merch_items.length == 1
+    end
+    merch_id_1.map { |i| merchants.find_by_id(i) }
+  end
+
+  def merchants_with_only_one_item_registered_in_month(month_string)
+    merchants_for_month = merchants.all.select { |m| Time.parse(m.created_at).strftime("%B") == month_string }
+    merchants_for_month.select do |m|
+      merchants_with_only_one_item.include?(m)
+    end
+    # merch_ids = unique_merchants.select do |m|
+    #   merch_invoices = invoices.all.select { |i| i.merchant_id == m }
+    #   month_counter = 0
+    #   merch_invoices.each do |i|
+    #     month_counter += 1 if i.created_at.strftime("%B") == month_string
+    #   end
+    #   month_counter == 1
+    # end
+    # merchants_array = merch_ids.map { |i| merchants.find_by_id(i) }
+    # merchants_array.select { |m| Time.parse(m.created_at).strftime("%B") == month_string }
+  end
+
+  def revenue_by_merchant(merch_id)
+    merch_invoices = invoices.all.select { |i| i.merchant_id == merch_id && invoice_paid_in_full?(i.id) }
+    invoice_ids = merch_invoices.map { |i| i.id }
+    invoice_items_array = invoice_ids.map { |i| invoice_items.find_all_by_invoice_id(i) }
+    revenue = []
+    invoice_items_array.flatten.map do |i|
+      rev = i.quantity * i.unit_price
+       revenue << rev if rev != nil
+    end
+    rev_total = revenue.inject(:+) if revenue.inject(:+).class == BigDecimal
+    rev_total
+  end
+
+  def most_sold_item_for_merchant(merch_id)
+    merch_invoices = invoices.all.select { |i| i.merchant_id == merch_id && invoice_paid_in_full?(i.id) }
+    invoice_ids = merch_invoices.map { |i| i.id }
+    invoice_items_array = invoice_ids.map { |i| invoice_items.find_all_by_invoice_id(i) }
+    max_invoice_item = invoice_items_array.flatten.max_by do |i|
+      i.quantity
+    end
+    num = max_invoice_item.quantity
+    max_array = invoice_items_array.flatten.select { |i| i.quantity == num }
+    items_array = []
+    max_array.each do |i|
+      items_array << items.find_by_id(i.item_id)
+    end
+    items_array
+  end
+
+  def best_item_for_merchant(merch_id)
+    merch_invoices = invoices.all.select { |i| i.merchant_id == merch_id && invoice_paid_in_full?(i.id) }
+    invoice_ids = merch_invoices.map { |i| i.id }
+    invoice_items_array = invoice_ids.map { |i| invoice_items.find_all_by_invoice_id(i) }
+    max_invoice_item = invoice_items_array.flatten.max_by do |i|
+      i.quantity * i.unit_price
+    end
+    items.find_by_id(max_invoice_item.item_id)
+  end
+
   #Helper methods
   private
   def merchant_ids_items
@@ -129,3 +271,13 @@ class SalesAnalyst
     Math.sqrt(sample_variance).round(2)
   end
 end
+
+# invoice_ids.map do |i|
+#   invoice_items_array = invoice_items.find_all_by_invoice_id(i)
+#   invoice_items_array.map do |i|
+#      revenue << (i.quantity * i.unit_price)
+#   end
+# end
+# hash[revenue.inject(:+)] = merchants.find_by_id(m)
+# end
+# hash
