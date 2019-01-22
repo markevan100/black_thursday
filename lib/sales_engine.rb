@@ -13,11 +13,11 @@ class SalesEngine
   def initialize(file_paths)
     @merchants ||= MerchantRepository.new(file_paths[:merchants])
     @items ||= ItemRepository.new(file_paths[:items])
-    @invoices = InvoiceRepository.new(file_paths[:invoices])
-    @invoice_items = InvoiceItemRepository.new(file_paths[:invoice_items])
-    @customers = CustomerRepository.new(file_paths[:customers])
-    @transactions = TransactionRepository.new(file_paths[:transactions])
-    @analyst = SalesAnalyst.new(@merchants, @items, @invoices, @invoice_items, @transactions, @customers)
+    @invoices ||= InvoiceRepository.new(file_paths[:invoices])
+    @invoice_items ||= InvoiceItemRepository.new(file_paths[:invoice_items])
+    @customers ||= CustomerRepository.new(file_paths[:customers])
+    @transactions ||= TransactionRepository.new(file_paths[:transactions])
+    @analyst ||= SalesAnalyst.new(@merchants, @items, @invoices, @invoice_items, @transactions, @customers)
   end
 
   def self.from_csv(file_paths)

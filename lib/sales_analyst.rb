@@ -10,12 +10,12 @@ class SalesAnalyst
 
   attr_reader :merchants, :items, :invoices, :invoice_items, :transactions, :customers
   def initialize(merchants, items, invoices, invoice_items, transactions, customers)
-    @merchants = merchants
-    @items = items
-    @invoices = invoices
-    @invoice_items = invoice_items
-    @transactions = transactions
-    @customers = customers
+    @merchants ||= merchants
+    @items ||= items
+    @invoices ||= invoices
+    @invoice_items ||= invoice_items
+    @transactions ||= transactions
+    @customers ||= customers
   end
 
   def average_items_per_merchant
@@ -23,11 +23,11 @@ class SalesAnalyst
   end
 
   def average_items_per_merchant_standard_deviation
-    standard_deviation(unique_merchants.map { |n| merchant_ids_items.count(n) })
+    standard_deviation(all_merchant_ids.map { |n| merchant_ids_items.count(n) })
   end
 
   def merchants_with_high_item_count
-    (unique_merchants.select { |n| merchant_ids_items.count(n) >= 7 }).map { |i| merchants.find_by_id(i) }
+    (all_merchant_ids.select { |n| merchant_ids_items.count(n) >= 7 }).map { |i| merchants.find_by_id(i) }
   end
 
   def average_item_price_for_merchant(merchant_id)
@@ -36,7 +36,7 @@ class SalesAnalyst
   end
 
   def average_average_price_per_merchant
-    averages_array = unique_merchants.map do |m_id|
+    averages_array = all_merchant_ids.map do |m_id|
       mean(items.find_all_by_merchant_id(m_id).map { |i| i.unit_price })
     end
     Kernel.BigDecimal((mean(averages_array).to_f.round(2) * 100).to_i)/100
@@ -61,20 +61,20 @@ class SalesAnalyst
   end
 
   def top_merchants_by_invoice_count
-    invoice_array = unique_merchants.map { |n| merchant_ids_invoices.count(n) }
+    invoice_array = all_merchant_ids.map { |n| merchant_ids_invoices.count(n) }
     invoice_mean = mean(invoice_array)
     strd_dev = standard_deviation(invoice_array)
     top_merch = invoice_mean + (strd_dev * 2)
-    top_merchant_ids = unique_merchants.select { |i| merchant_ids_invoices.count(i) >= top_merch}
+    top_merchant_ids = all_merchant_ids.select { |i| merchant_ids_invoices.count(i) >= top_merch}
     top_merchant_ids.map { |i| merchants.find_by_id(i) }
   end
 
   def bottom_merchants_by_invoice_count
-    invoice_array = unique_merchants.map { |n| merchant_ids_invoices.count(n) }
+    invoice_array = all_merchant_ids.map { |n| merchant_ids_invoices.count(n) }
     invoice_mean = mean(invoice_array)
     strd_dev = standard_deviation(invoice_array)
     top_merch = invoice_mean - (strd_dev * 2)
-    top_merchant_ids = unique_merchants.select { |i| merchant_ids_invoices.count(i) <= top_merch}
+    top_merchant_ids = all_merchant_ids.select { |i| merchant_ids_invoices.count(i) <= top_merch}
     top_merchant_ids.map { |i| merchants.find_by_id(i) }
   end
 
@@ -119,7 +119,7 @@ class SalesAnalyst
 
   def top_revenue_earners(x = 20)
     hash = {}
-    unique_merchants.map do |m|
+    all_merchant_ids.map do |m|
       invoice_ids = []
       invoices.all.each do |i|
         if (i.merchant_id == m) && (invoice_paid_in_full?(i.id))
@@ -145,7 +145,7 @@ class SalesAnalyst
 
   def merchants_ranked_by_revenue
     hash = {}
-    unique_merchants.map do |m|
+    all_merchant_ids.map do |m|
       invoice_ids = []
       invoices.all.each do |i|
         if (i.merchant_id == m) && (invoice_paid_in_full?(i.id))
@@ -169,7 +169,7 @@ class SalesAnalyst
   end
 
   def merchants_with_pending_invoices
-    pend_merch_ids = unique_merchants.select do |m|
+    pend_merch_ids = all_merchant_ids.select do |m|
       merch_invoices = invoices.all.select { |i| i.merchant_id == m }
       merch_invoice_ids = merch_invoices.map { |i| i.id }
       no_suc = merch_invoice_ids.select do |i|
@@ -183,7 +183,7 @@ class SalesAnalyst
   end
 
   def merchants_with_only_one_item
-    merch_id_1 = unique_merchants.select do |m|
+    merch_id_1 = all_merchant_ids.select do |m|
       merch_items = items.all.select { |i| i.merchant_id == m }
       merch_items.length == 1
     end
@@ -192,72 +192,38 @@ class SalesAnalyst
 
   def merchants_with_only_one_item_registered_in_month(month_string)
     merchants_for_month = merchants.all.select { |m| Time.parse(m.created_at).strftime("%B") == month_string }
-    merchants_for_month.select do |m|
-      merchants_with_only_one_item.include?(m)
-    end
-    # merch_ids = unique_merchants.select do |m|
-    #   merch_invoices = invoices.all.select { |i| i.merchant_id == m }
-    #   month_counter = 0
-    #   merch_invoices.each do |i|
-    #     month_counter += 1 if i.created_at.strftime("%B") == month_string
-    #   end
-    #   month_counter == 1
-    # end
-    # merchants_array = merch_ids.map { |i| merchants.find_by_id(i) }
-    # merchants_array.select { |m| Time.parse(m.created_at).strftime("%B") == month_string }
+    merchants_for_month.select { |m| merchants_with_only_one_item.include?(m) }
   end
 
   def revenue_by_merchant(merch_id)
-    merch_invoices = invoices.all.select { |i| i.merchant_id == merch_id && invoice_paid_in_full?(i.id) }
-    invoice_ids = merch_invoices.map { |i| i.id }
-    invoice_items_array = invoice_ids.map { |i| invoice_items.find_all_by_invoice_id(i) }
-    revenue = []
-    invoice_items_array.flatten.map do |i|
-      rev = i.quantity * i.unit_price
-       revenue << rev if rev != nil
-    end
-    rev_total = revenue.inject(:+) if revenue.inject(:+).class == BigDecimal
-    rev_total
+    invoice_items_array(merch_id).map { |i| i.quantity * i.unit_price }.compact.inject(:+)
   end
 
   def most_sold_item_for_merchant(merch_id)
-    merch_invoices = invoices.all.select { |i| i.merchant_id == merch_id && invoice_paid_in_full?(i.id) }
-    invoice_ids = merch_invoices.map { |i| i.id }
-    invoice_items_array = invoice_ids.map { |i| invoice_items.find_all_by_invoice_id(i) }
-    max_invoice_item = invoice_items_array.flatten.max_by do |i|
-      i.quantity
-    end
-    num = max_invoice_item.quantity
-    max_array = invoice_items_array.flatten.select { |i| i.quantity == num }
-    items_array = []
-    max_array.each do |i|
-      items_array << items.find_by_id(i.item_id)
-    end
-    items_array
+    max_quantify_invoice_item = invoice_items_array(merch_id).max_by { |i| i.quantity }
+    max_array = invoice_items_array(merch_id).select { |i| i.quantity == max_quantify_invoice_item.quantity }
+    max_array.map { |i| items.find_by_id(i.item_id) }
   end
 
   def best_item_for_merchant(merch_id)
-    merch_invoices = invoices.all.select { |i| i.merchant_id == merch_id && invoice_paid_in_full?(i.id) }
-    invoice_ids = merch_invoices.map { |i| i.id }
-    invoice_items_array = invoice_ids.map { |i| invoice_items.find_all_by_invoice_id(i) }
-    max_invoice_item = invoice_items_array.flatten.max_by do |i|
+    max_revenue_invoice_item = invoice_items_array(merch_id).max_by do |i|
       i.quantity * i.unit_price
     end
-    items.find_by_id(max_invoice_item.item_id)
+    items.find_by_id(max_revenue_invoice_item.item_id)
   end
 
   #Helper methods
   private
   def merchant_ids_items
-    items.all.map { |i| i.merchant_id }
+    @merchant_ids_items ||= items.all.map { |i| i.merchant_id }
   end
 
   def merchant_ids_invoices
-    invoices.all.map { |i| i.merchant_id }
+    @merchant_ids_invoices ||= invoices.all.map { |i| i.merchant_id }
   end
 
-  def unique_merchants
-    merchant_ids_items.uniq
+  def all_merchant_ids
+    @all_merchant_ids ||= merchants.all.map { |m| m.id }
   end
 
   def mean(array)
@@ -270,14 +236,9 @@ class SalesAnalyst
     sample_variance = var_sum / (array.length - 1)
     Math.sqrt(sample_variance).round(2)
   end
-end
 
-# invoice_ids.map do |i|
-#   invoice_items_array = invoice_items.find_all_by_invoice_id(i)
-#   invoice_items_array.map do |i|
-#      revenue << (i.quantity * i.unit_price)
-#   end
-# end
-# hash[revenue.inject(:+)] = merchants.find_by_id(m)
-# end
-# hash
+  def invoice_items_array(merch_id)
+    invoice_ids = invoices.all.map { |i| i.id if i.merchant_id == merch_id && invoice_paid_in_full?(i.id) }
+    invoice_ids.map { |i| invoice_items.find_all_by_invoice_id(i) }.flatten
+  end
+end
